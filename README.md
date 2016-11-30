@@ -1,0 +1,2 @@
+# arduino-bluetooth-led-lights-controller
+This project represents an Arduino implementation of an LED light strip bluetooth controller.  After forking the project at http://funkboxing.com/wordpress/?p=1366, changes were made to reduce the memory footprint and incorporate additional LED light strip functions.  Presently, an Android app is being developed to drive the controller, and should be available in the near future.
