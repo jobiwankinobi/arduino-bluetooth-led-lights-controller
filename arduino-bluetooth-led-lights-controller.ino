@@ -50,7 +50,7 @@ int thisBLU = 0;
 #define SOFT_RX_PIN 2         // BTCHIP-TX -> ARDUINO-SOFT-RX (2)
 #define SOFT_TX_PIN 3         // BTCHIP-RX -> ARDUINO-SOFT-TX (3)
 
-Serial btSerial(SOFT_RX_PIN, SOFT_TX_PIN);
+SoftwareSerial btSerial(SOFT_RX_PIN, SOFT_TX_PIN); // Setup a SoftwareSerial interface (as opposed to hardware Serial, which is defined by default)
 int btBOOL = 1;              //-ACTIVATE BLUETOOTH OR NOT
 byte inbyte;                 //-SERIAL INPUT BYTE
 int thisarg;                 //-SERIAL INPUT ARG
