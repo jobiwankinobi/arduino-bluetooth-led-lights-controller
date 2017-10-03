@@ -15,8 +15,9 @@
 #define VERSION_NUMBER 0.51
 
 //---LED SETUP STUFF
-#define LED_COUNT 300          //FOR TESTING w/ SIGN
-#define LED_DT 9             //SERIAL DATA PIN
+#define LED_COUNT 60          //FOR TESTING w/ SIGN
+#define LED_DT 13             //SERIAL DATA PIN
+#define POTENTIOMETER_PIN 3             //POTENTIOMETER PIN
 //#define LED_CK 11             //SERIAL CLOCK PIN
 
 int BOTTOM_INDEX = 0;
@@ -26,13 +27,31 @@ struct CRGB leds[LED_COUNT];
 struct CRGB led_copy_temp;     // used as a memory saving means over former implementation of entire led array available as CRGB array
 //int ledsX[LED_COUNT][3];     //-ARRAY FOR COPYING WHATS IN THE LED STRIP CURRENTLY (FOR CELL-AUTOMATA, MARCH, ETC)
 //int ledMode = 3;           //-START IN RAINBOW LOOP
-int ledMode = 14;         //-START IN DEMO MODE
-//int ledMode = 6;             //-MODE TESTING
 
-int thisdelay = 50;          //-FX LOOPS DELAY VAR
-int thisstep = 10;           //-FX LOOPS DELAY VAR
-int thishue = 0;             //-FX LOOPS DELAY VAR
+
+                 //int ledMode = 3;           //-START IN RAINBOW LOOP
+int ledMode = 14;         //-value for driving which mode is currently active
+int demoMode = 1;         //-controls which demo mode to show
+boolean endDemo = false;         //-controls ending of demo mode, return to loop
+
+int thisdelay = 50;          //-FX LOOPS DELAY VAR 
+int thisstep = 10;           //-FX LOOPS DELAY VAR 
+int thishue = 0;             //-FX LOOPS DELAY VAR 
 int thissat = 255;           //-FX LOOPS DELAY VAR
+
+int basedelay = 50;          //-FX LOOPS DELAY VAR
+int thisdelay_multiplier = 1;
+int basestep = 10;          //-FX LOOPS DELAY VAR
+int thisstep_multiplier = 1;
+int basehue = 0;          //-FX LOOPS DELAY VAR
+int thishue_multiplier = 1;
+int basesat = 255;          //-FX LOOPS DELAY VAR
+int thissat_multiplier = 1;
+
+
+int potentiometer_value = 0;
+int old_potentiometer_value = 0;
+
 int max_bright = 20;         //-SET MAX BRIGHTNESS TO 1/4
 
 int thisindex = 0;           //-SET SINGLE LED VAR
@@ -42,9 +61,9 @@ int thisBLU = 0;
 
 //---SERIAL/SOFTWARE SERIAL SETUP STUFF
 //#define SERIAL_BAUDRATE 38400
-#define SERIAL_BAUDRATE 9600
+//#define SERIAL_BAUDRATE 9600
 //#define SERIAL_BAUDRATE 57600
-//#define SERIAL_BAUDRATE 115200
+#define SERIAL_BAUDRATE 115200
 #define SERIAL_TIMEOUT 5
 
 #define SOFT_RX_PIN 2         // BTCHIP-TX -> ARDUINO-SOFT-RX (2)
@@ -847,59 +866,377 @@ static void delayToSyncFrameRate( uint8_t framesPerSecond)
 }
 
 
+
+
 // End block of code related to standalone Halloween sketch.
-void new_rainbow_loop(){                       //-m88-RAINBOW FADE FROM FAST_SPI2
+
+
+void new_rainbow_loop() {                       //-m88-RAINBOW FADE FROM FAST_SPI2
   ihue -= 1;
-  fill_rainbow( leds, LED_COUNT, ihue );
+  fill_rainbow(leds, LED_COUNT, ihue);
   LEDS.show();
   delay(thisdelay);
 }
 
+void demo_mode1() {
+  Serial.println("Running Demo 1");
+  int r = 20;
+  basedelay = 80; basestep = 10; basehue = 0; basesat = 255;
+  if(control_flow()){return;}
+  one_color_all(0, 0, 0); LEDS.show(); delay(1200); 
+
+  thisdelay_multiplier = 1.5;
+
+
+//for(int j = 0; j < 255; j+=10){
+//  //basesat = j;
+//  basehue = 255 - j;
+//    Serial.println("matrix");
+//  for (int i = 0; i<r * 2; i++) { if(control_flow()){return;} kitt();}
+//  }
+  
+  
+for(int j = 0; j < 255; j+=10){
+       basehue = floor(random(0,255));
+  idex = 0;
+if(round(random(1,2) == 2)){
+               for (int i = 0; i<100; i++) { if(control_flow()){return;} 
+    color_explode();
+  } 
+
+    } else {
+       for (int i = 0; i<100; i++) { if(control_flow()){return;} 
+              color_implode();
+  }
+  
+    }
+}
+
+for(int j = 0; j < 255; j+=10){
+  thisdelay_multiplier = 1.5;
+  //basesat = j;
+  basehue = 255 - j;
+    Serial.println("matrix");
+  for (int i = 0; i<r * 2; i++) { if(control_flow()){return;} matrix();}
+  }
+
+
+  
+  Serial.println("pulse_one_color_all_rev");
+  for (int i = 0; i<r * 50; i++) { if(control_flow()){return;} pulse_one_color_all_rev();}
+  Serial.println("rainbow_loop");
+  for (int i = 0; i<r * 20; i++) { if(control_flow()){return;} rainbow_loop();}
+  Serial.println("random_burst");
+  for (int i = 0; i<r * 20; i++) { if(control_flow()){return;} random_burst();}
+  Serial.println("rainbow_loop");
+  for (int i = 0; i<r * 20; i++) { if(control_flow()){return;} rainbow_loop();}
+//  Serial.println("pulse_one_color_all");
+//  for (int i = 0; i<r * 50; i++) { if(control_flow()){return;} pulse_one_color_all();}
+    Serial.println("matrix");
+  for (int i = 0; i<r * 50; i++) { if(control_flow()){return;} matrix();}
+      Serial.println("theatre_chase");
+  for (int i = 0; i<r * 50; i++) { if(control_flow()){return;} theater_chase();}
+  
+  Serial.println("color_bounce");  
+  for (int i = 0; i<r * 12; i++) { if(control_flow()){return;} color_bounce();}
+  basedelay = 40;
+  Serial.println("color_bounceFADE");
+  for (int i = 0; i<r * 12; i++) { if(control_flow()){return;} color_bounceFADE();}
+  Serial.println("ems_lightsONE");
+  for (int i = 0; i<r * 6; i++) { if(control_flow()){return;} ems_lightsONE();}
+    Serial.println("color_bounceFADE");
+  for (int i = 0; i<r * 6; i++) { if(control_flow()){return;} color_bounceFADE();}
+    Serial.println("color_bounceFADE");
+  for (int i = 0; i<r * 3; i++) { if(control_flow()){return;} color_bounceFADE();}
+
+
+  Serial.println("ems_lightsALL");
+  for (int i = 0; i<r * 5; i++) { if(control_flow()){return;} ems_lightsALL();}
+
+    Serial.println("bomber");
+  for (int i = 0; i<r * 5; i++) { if(control_flow()){return;} bomber();}
+    Serial.println("fade_vertical");
+  for (int i = 0; i<r * 5; i++) { if(control_flow()){return;} fade_vertical();}
+
+    Serial.println("rwb_march");
+  for (int i = 0; i<r * 5; i++) { if(control_flow()){return;} rwb_march();}
+    Serial.println("random_color_pop");
+  for (int i = 0; i<r * 5; i++) { if(control_flow()){return;} random_color_pop();}
+    Serial.println("rgb_propeller");
+  for (int i = 0; i<r * 5; i++) { if(control_flow()){return;} rgb_propeller();}
+    Serial.println("discostrobe");
+  for (int i = 0; i<r * 5; i++) { if(control_flow()){return;} discostrobe();}
+
+
+  Serial.println("second part after reset");
+    
+  one_color_all(0, 0, 0); LEDS.show();
+  basedelay = 15; basehue = 0; basesat = 255;
+  Serial.println("pulse_one_color_all");
+  for (int i = 0; i<r * 50; i++) { if(control_flow()){return;} pulse_one_color_all();}
+  Serial.println("pulse_one_color_all_rev");
+  for (int i = 0; i<r * 40; i++) { if(control_flow()){return;} pulse_one_color_all_rev();}
+  basedelay = 60; basehue = 180;
+  Serial.println("fade_vertical");
+  for (int i = 0; i<r * 5; i++) { if(control_flow()){return;} fade_vertical();}
+  basedelay = 80;
+  Serial.println("rwb_march");
+  for (int i = 0; i<r * 5; i++) { if(control_flow()){return;} rwb_march();}
+  one_color_all(0, 0, 0); LEDS.show();
+  basedelay = 60; basehue = 95;
+  Serial.println("radiation");
+  for (int i = 0; i<r * 15; i++) { if(control_flow()){return;} radiation();}
+  Serial.println("color_loop_vardelayghtsALL");
+  for (int i = 0; i<r * 15; i++) { if(control_flow()){return;} color_loop_vardelay();}
+//  Serial.println("white_temps");
+//  for (int i = 0; i<r * 5; i++) { if(control_flow()){return;} white_temps();}
+ 
+  for(int j = 0; j < 255; j+=10){
+       basehue = floor(random(0,255));
+  idex = 0;
+if(round(random(1,2) == 2)){
+               for (int i = 0; i<100; i++) { if(control_flow()){return;} 
+    color_explode();
+  } 
+
+    } else {
+       for (int i = 0; i<100; i++) { if(control_flow()){return;} 
+              color_implode();
+  }
+  
+    }
+}
+
+//  basedelay = 35; basehue = 180;
+//  Serial.println("sin_bright_wave");
+//  for (int i = 0; i<r; i++) { if(control_flow()){return;} sin_bright_wave();}
+  basedelay = 100; basehue = 0;
+  Serial.println("pop_horizontal");
+  for (int i = 0; i<r * 5; i++) { if(control_flow()){return;} pop_horizontal();}
+  basedelay = 100; basehue = 180;
+  Serial.println("quad_bright_curve");
+  for (int i = 0; i<r * 4; i++) { if(control_flow()){return;} quad_bright_curve();}
+  one_color_all(0, 0, 0); LEDS.show();
+  Serial.println("fl");
+  for (int i = 0; i<r * 3; i++) { if(control_flow()){return;} flame();}
+
+  basedelay = 50; basestep = 15;
+  Serial.println("rainbow_vertical");
+  for (int i = 0; i<r * 12; i++) { if(control_flow()){return;} rainbow_vertical();}
+
+  basedelay = 5;
+  Serial.println("new_rainbow_loop");
+  for (int i = 0; i<r * 120; i++) { if(control_flow()){return;} new_rainbow_loop();}
+  if(control_flow()){return;}
+
+}
+
+
+
+void demo_mode2() {
+  Serial.println("Running Demo 2");
+  int r = 20;
+  basedelay = 80; basestep = 10; basehue = 0; basesat = 255;
+  if(control_flow()){return;}
+  one_color_all(0, 0, 0); LEDS.show(); delay(1200); 
+
+for(int j = 0; j < 255; j+=10){
+  thisdelay_multiplier = 1.5;
+    basehue = floor(random(0,255));
+    Serial.println("matrix");
+  for (int i = 0; i<r * 2; i++) { if(control_flow()){return;} matrix();}
+  }
+
+  for(int j = 255; j > 0; j-=10){
+  thisdelay_multiplier = 1.5;
+    basehue = 255 - j;
+    Serial.println("matrix");
+  for (int i = 0; i<r * 2; i++) { if(control_flow()){return;} matrix();}
+  }
+
+  for(int j = 0; j < 255; j+=10){
+    basehue = floor(random(0,255));
+    Serial.println("color_bounceFADE");
+  for (int i = 0; i<r * 1; i++) { if(control_flow()){return;} color_bounceFADE();}
+  }
+
+  for(int j = 255; j > 0; j-=10){
+    basehue = 255 - j;
+    Serial.println("color_bounceFADE");
+  for (int i = 0; i<r * 1; i++) { if(control_flow()){return;} color_bounceFADE();}
+  }
+
+}
+
+void demo_mode3() {
+      basedelay = 100;
+        basesat = 255;
+    basehue = 1;
+    thisdelay_multiplier = 1;
+    basedelay = 120;
+    
+    Serial.println("Running Demo 3");
+
+
+
+
+  for (int i = 0; i<100 * 5; i++) { if(control_flow()){return;} rgb_propeller();}
+    for (int i = 0; i<10 * 5; i++) { if(control_flow()){return;} random_burst();}
+
+  for (int i = 0; i<100 * 5; i++) { if(control_flow()){return;} rainbow_loop();}
+
+  for (int i = 0; i<100 * 5; i++) { if(control_flow()){return;} rainbow_vertical();}
+  for (int i = 0; i<100 * 5; i++) { if(control_flow()){return;} rainbow_loop();}
+
+
+    basedelay = 20;
+    for (int i = 0; i<1 * 5; i++) { if(control_flow()){return;} flame();}
+    basedelay = 60;
+    for(int j = 10; j < 100; j+=1){
+      basehue = j;
+        for (int i = 0; i<2; i++) { if(control_flow()){return;} theater_chase();}
+    }
+    basedelay = 120;
+
+
+    for(int j = 0; j < 255; j+=50){
+       basehue = floor(random(0,255));
+  idex = 0;
+if(round(random(1,2) == 2)){
+               for (int i = 0; i<100; i++) { if(control_flow()){return;} 
+    color_explode();
+  } 
+
+    } else {
+       for (int i = 0; i<100; i++) { if(control_flow()){return;} 
+              color_implode();
+  }
+  
+    }
+}
+
+
+    for (int i = 0; i<30 * 5; i++) { if(control_flow()){return;} random_burst();}
+      for (int i = 0; i<5 * 5; i++) { if(control_flow()){return;} random_color_pop();}
+
+  for (int i = 0; i<100 * 5; i++) { if(control_flow()){return;} rainbow_vertical();}
+
+
+
+    for (int i = 0; i<100 * 5; i++) { if(control_flow()){return;} color_loop_vardelay();}
+  for (int i = 0; i<100 * 5; i++) { if(control_flow()){return;} rainbow_loop();}
+
+
+}
+
+
+void demo_mode4() {
+    Serial.println("Running Demo 4");
+    basedelay = 100;
+        basesat = 255;
+    basehue = 1;
+    thisdelay_multiplier = 1;
+    basedelay = 30;
+
+            for (int i = 0; i<100 * 5; i++) { if(control_flow()){return;} ems_lightsALL();}
+  for (int i = 0; i<2; i++) { if(control_flow()){return;} ems_lightsSTROBE();}
+    for (int i = 0; i<100 * 5; i++) { if(control_flow()){return;} ems_lightsALL();}
+  for (int i = 0; i<100 * 5; i++) { if(control_flow()){return;} ems_lightsONE();}
+
+              for (int i = 0; i<100 * 5; i++) { if(control_flow()){return;} ems_lightsALL();}
+  for (int i = 0; i<2; i++) { if(control_flow()){return;} ems_lightsSTROBE();}
+    for (int i = 0; i<100 * 5; i++) { if(control_flow()){return;} ems_lightsALL();}
+  for (int i = 0; i<100 * 5; i++) { if(control_flow()){return;} ems_lightsONE();}
+  
+  //todo, get ems working with different colors, strobing only blue and red
+//    for(int j = 0; j < 255; j+=50){
+//      basehue = j;
+//         }
+
+}
+
+
+void demo_mode5() {
+      basedelay = 100;
+        basesat = 255;
+    basehue = 1;
+    thisdelay_multiplier = 1;
+    basedelay = 30;
+  Serial.println("Running Demo 5");
+    Serial.println("discostrobe");
+
+for(int j = 10; j < 100; j+=10){
+      basedelay = j;
+
+  for (int i = 0; i<10 * 5; i++) { if(control_flow()){return;} discostrobe();}
+}
+
+
+for(int j = 100; j > 10; j-=10){
+      basedelay = j;
+
+  for (int i = 0; i<5 * 5; i++) { if(control_flow()){return;} discostrobe();}
+}
+}
+
+void run_demo(int mode) {
+  switch (mode) {
+  case 0: ledMode = 0; one_color_all(0, 0, 0);endDemo = true;break;
+  case 1: demo_mode1();break;
+  case 2: demo_mode2();break;
+  case 3: demo_mode3();break;
+  case 4: demo_mode4();break;
+  case 5: demo_mode5();break;
+  default: demo_mode5();
+  }
+}
+
+
 //-Many of the following cases were commented out to prevent the strip's hue, saturation, and delay from resetting when another mode is chosen.
 //-The responsibility of changing these parameters prior to a mode change would preferibly be done in the bluetooth controlling device fia multiple commands in the same byte stream.
-void change_mode(int newmode){
-  thissat = 255;
+void change_mode(int newmode) {
+  basesat = 255;
   switch (newmode) {
-    case 0: one_color_all(0,0,0); LEDS.show(); break;   //---ALL OFF
-    case 1: one_color_all(255,255,255); LEDS.show(); break;   //---ALL ON
-//    case 2: thisdelay = 20; break;                      //---STRIP RAINBOW FADE
-//    case 3: thisdelay = 20; thisstep = 10; break;       //---RAINBOW LOOP
-//    case 4: thisdelay = 20; break;                      //---RANDOM BURST
-//    case 5: thisdelay = 20; thishue = 0; break;         //---CYLON v1
-//    case 6: thisdelay = 40; thishue = 0; break;         //---CYLON v2
-//    case 7: thisdelay = 40; thishue = 0; break;         //---POLICE LIGHTS SINGLE
-//    case 8: thisdelay = 40; thishue = 0; break;         //---POLICE LIGHTS SOLID
-//    case 9: break;         //---STRIP FLICKER
-    case 9: idex=TOP_INDEX; break;         //---BOMBER
-//    case 10: thisdelay = 15; thishue = 0; break;        //---PULSE COLOR BRIGHTNESS
-//    case 11: thisdelay = 15; thishue = 0; break;        //---PULSE COLOR SATURATION
-//    case 12: thisdelay = 60; thishue = 180; break;      //---VERTICAL SOMETHING
-    case 13: idex = 1; break;                  //---theater chase - RULE 30 (RED)
-    case 14: idex = 0; break;                     //---MARCH RANDOM COLORS
-    case 15: break;                     //---MARCH RWB COLORS
-    case 16: one_color_all(0,0,0); break;       //---RADIATION SYMBOL
-//    case 16: thisdelay = 60; thishue = 95; break;       //---RADIATION SYMBOL
-//    //---PLACEHOLDER FOR COLOR LOOP VAR DELAY VARS
-//    case 19: thisdelay = 35; thishue = 180; break;      //---SIN WAVE BRIGHTNESS
-//    case 20: thisdelay = 100; thishue = 0; break;       //---POP LEFT/RIGHT
-//    case 21: thisdelay = 100; thishue = 180; break;     //---QUADRATIC BRIGHTNESS CURVE
-//    //---PLACEHOLDER FOR FLAME VARS
-//    case 23: thisdelay = 50; thisstep = 15; break;      //---VERITCAL RAINBOW
-    case 24: idex=0; break;                     //---PACMAN
-//    case 25: thisdelay = 35; break;                     //---RANDOM COLOR POP
-//    case 26: thisdelay = 25; thishue = 0; break;        //---EMERGECNY STROBE
-//    case 27: thisdelay = 25; thishue = 0; break;        //---RGB PROPELLER
-//    case 28: thisdelay = 100; thishue = 0; break;       //---KITT
-//    case 29: thisdelay = 50; thishue = 95; break;       //---MATRIX RAIN
-//    case 50: thisdelay = 100; break;                    //---MARCH STRIP NOW CCW
-//    case 51: thisdelay = 100; break;                    //---MARCH STRIP NOW CCW  
-//    case 88: thisdelay = 5; break;                      //---NEW RAINBOW LOOP
-    case 101: one_color_all(255,0,0); LEDS.show(); break;   //---ALL RED
-    case 102: one_color_all(0,255,0); LEDS.show(); break;   //---ALL GREEN
-    case 103: one_color_all(0,0,255); LEDS.show(); break;   //---ALL BLUE
-    case 104: one_color_all(255,255,0); LEDS.show(); break;   //---ALL COLOR X
-    case 105: one_color_all(0,255,255); LEDS.show(); break;   //---ALL COLOR Y
-    case 106: one_color_all(255,0,255); LEDS.show(); break;   //---ALL COLOR Z
+  case 0: one_color_all(0, 0, 0); LEDS.show(); break;   //---ALL OFF
+  case 1: one_color_all(255, 255, 255); LEDS.show(); break;   //---ALL ON
+                                //    case 2: basedelay = 20; break;                      //---STRIP RAINBOW FADE
+                                //    case 3: basedelay = 20; thisstep = 10; break;       //---RAINBOW LOOP
+                                //    case 4: basedelay = 20; break;                      //---RANDOM BURST
+                                //    case 5: basedelay = 20; basehue = 0; break;         //---CYLON v1
+                                //    case 6: basedelay = 40; basehue = 0; break;         //---CYLON v2
+                                //    case 7: basedelay = 40; basehue = 0; break;         //---POLICE LIGHTS SINGLE
+                                //    case 8: basedelay = 40; basehue = 0; break;         //---POLICE LIGHTS SOLID
+                                //    case 9: break;         //---STRIP FLICKER
+  case 9: idex = TOP_INDEX; break;         //---BOMBER
+                       //    case 10: basedelay = 15; basehue = 0; break;        //---PULSE COLOR BRIGHTNESS
+                       //    case 11: basedelay = 15; basehue = 0; break;        //---PULSE COLOR SATURATION
+                       //    case 12: basedelay = 60; basehue = 180; break;      //---VERTICAL SOMETHING
+  case 13: idex = 1; break;                  //---theater chase - RULE 30 (RED)
+  case 14: idex = 0; break;                     //---MARCH RANDOM COLORS
+  case 15: break;                     //---MARCH RWB COLORS
+  case 16: one_color_all(0, 0, 0); break;       //---RADIATION SYMBOL
+                          //    case 16: basedelay = 60; basehue = 95; break;       //---RADIATION SYMBOL
+                          //    //---PLACEHOLDER FOR COLOR LOOP VAR DELAY VARS
+                          //    case 19: basedelay = 35; basehue = 180; break;      //---SIN WAVE BRIGHTNESS
+                          //    case 20: basedelay = 100; basehue = 0; break;       //---POP LEFT/RIGHT
+                          //    case 21: basedelay = 100; basehue = 180; break;     //---QUADRATIC BRIGHTNESS CURVE
+                          //    //---PLACEHOLDER FOR FLAME VARS
+                          //    case 23: basedelay = 50; thisstep = 15; break;      //---VERITCAL RAINBOW
+  case 24: idex = 0; break;                     //---PACMAN
+                          //    case 25: basedelay = 35; break;                     //---RANDOM COLOR POP
+                          //    case 26: basedelay = 25; basehue = 0; break;        //---EMERGECNY STROBE
+                          //    case 27: basedelay = 25; basehue = 0; break;        //---RGB PROPELLER
+                          //    case 28: basedelay = 100; basehue = 0; break;       //---KITT
+                          //    case 29: basedelay = 50; basehue = 95; break;       //---MATRIX RAIN
+                          //    case 50: basedelay = 100; break;                    //---MARCH STRIP NOW CCW
+                          //    case 51: basedelay = 100; break;                    //---MARCH STRIP NOW CCW  
+                          //    case 88: basedelay = 5; break;                      //---NEW RAINBOW LOOP
+  case 101: one_color_all(255, 0, 0); LEDS.show(); break;   //---ALL RED
+  case 102: one_color_all(0, 255, 0); LEDS.show(); break;   //---ALL GREEN
+  case 103: one_color_all(0, 0, 255); LEDS.show(); break;   //---ALL BLUE
+  case 104: one_color_all(255, 255, 0); LEDS.show(); break;   //---ALL COLOR X
+  case 105: one_color_all(0, 255, 255); LEDS.show(); break;   //---ALL COLOR Y
+  case 106: one_color_all(255, 0, 255); LEDS.show(); break;   //---ALL COLOR Z
   }
 
   bouncedirection = 0;
@@ -909,43 +1246,43 @@ void change_mode(int newmode){
 
 
 
-//
+// todo, color reset should only be necessary if the next mode will not consume previous node, which will give more continuity between mode changes
 //void change_mode(int newmode){
-//  thissat = 255;
+//  basesat = 255;
 //  switch (newmode) {
 //    case 0: one_color_all(0,0,0); LEDS.show(); break;   //---ALL OFF
 //    case 1: one_color_all(255,255,255); LEDS.show(); break;   //---ALL ON
-//    case 2: thisdelay = 20; break;                      //---STRIP RAINBOW FADE
-//    case 3: thisdelay = 20; thisstep = 10; break;       //---RAINBOW LOOP
-//    case 4: thisdelay = 20; break;                      //---RANDOM BURST
-//    case 5: thisdelay = 20; thishue = 0; break;         //---CYLON v1
-//    case 6: thisdelay = 40; thishue = 0; break;         //---CYLON v2
-//    case 7: thisdelay = 40; thishue = 0; break;         //---POLICE LIGHTS SINGLE
-//    case 8: thisdelay = 40; thishue = 0; break;         //---POLICE LIGHTS SOLID
-////    case 9: thishue = 160; thissat = 50; break;         //---STRIP FLICKER
+//    case 2: basedelay = 20; break;                      //---STRIP RAINBOW FADE
+//    case 3: basedelay = 20; thisstep = 10; break;       //---RAINBOW LOOP
+//    case 4: basedelay = 20; break;                      //---RANDOM BURST
+//    case 5: basedelay = 20; basehue = 0; break;         //---CYLON v1
+//    case 6: basedelay = 40; basehue = 0; break;         //---CYLON v2
+//    case 7: basedelay = 40; basehue = 0; break;         //---POLICE LIGHTS SINGLE
+//    case 8: basedelay = 40; basehue = 0; break;         //---POLICE LIGHTS SOLID
+////    case 9: basehue = 160; basesat = 50; break;         //---STRIP FLICKER
 //    case 9: idex=0; break;         //---STRIP FLICKER
-//    case 10: thisdelay = 15; thishue = 0; break;        //---PULSE COLOR BRIGHTNESS
-//    case 11: thisdelay = 15; thishue = 0; break;        //---PULSE COLOR SATURATION
-//    case 12: thisdelay = 60; thishue = 180; break;      //---VERTICAL SOMETHING
+//    case 10: basedelay = 15; basehue = 0; break;        //---PULSE COLOR BRIGHTNESS
+//    case 11: basedelay = 15; basehue = 0; break;        //---PULSE COLOR SATURATION
+//    case 12: basedelay = 60; basehue = 180; break;      //---VERTICAL SOMETHING
 //    case 13:  break; // had idex = 1;, was cauisng breakage                   //---theater chase - RULE 30 (RED)
 //    case 14: idex = 0; break;                     //---MARCH RANDOM COLORS
 //    case 15: break;                     //---MARCH RWB COLORS
-//    case 16: thisdelay = 60; thishue = 95; break;       //---RADIATION SYMBOL
+//    case 16: basedelay = 60; basehue = 95; break;       //---RADIATION SYMBOL
 //    //---PLACEHOLDER FOR COLOR LOOP VAR DELAY VARS
-//    case 19: thisdelay = 35; thishue = 180; break;      //---SIN WAVE BRIGHTNESS
-//    case 20: thisdelay = 100; thishue = 0; break;       //---POP LEFT/RIGHT
-//    case 21: thisdelay = 100; thishue = 180; break;     //---QUADRATIC BRIGHTNESS CURVE
+//    case 19: basedelay = 35; basehue = 180; break;      //---SIN WAVE BRIGHTNESS
+//    case 20: basedelay = 100; basehue = 0; break;       //---POP LEFT/RIGHT
+//    case 21: basedelay = 100; basehue = 180; break;     //---QUADRATIC BRIGHTNESS CURVE
 //    //---PLACEHOLDER FOR FLAME VARS
-//    case 23: thisdelay = 50; thisstep = 15; break;      //---VERITCAL RAINBOW
+//    case 23: basedelay = 50; thisstep = 15; break;      //---VERITCAL RAINBOW
 //    case 24: idex=0; break;                     //---PACMAN
-//    case 25: thisdelay = 35; break;                     //---RANDOM COLOR POP
-//    case 26: thisdelay = 25; thishue = 0; break;        //---EMERGECNY STROBE
-//    case 27: thisdelay = 25; thishue = 0; break;        //---RGB PROPELLER
-//    case 28: thisdelay = 100; thishue = 0; break;       //---KITT
-//    case 29: thisdelay = 50; thishue = 95; break;       //---MATRIX RAIN
-//    case 50: thisdelay = 100; break;                    //---MARCH STRIP NOW CCW
-//    case 51: thisdelay = 100; break;                    //---MARCH STRIP NOW CCW  
-//    case 88: thisdelay = 5; break;                      //---NEW RAINBOW LOOP
+//    case 25: basedelay = 35; break;                     //---RANDOM COLOR POP
+//    case 26: basedelay = 25; basehue = 0; break;        //---EMERGECNY STROBE
+//    case 27: basedelay = 25; basehue = 0; break;        //---RGB PROPELLER
+//    case 28: basedelay = 100; basehue = 0; break;       //---KITT
+//    case 29: basedelay = 50; basehue = 95; break;       //---MATRIX RAIN
+//    case 50: basedelay = 100; break;                    //---MARCH STRIP NOW CCW
+//    case 51: basedelay = 100; break;                    //---MARCH STRIP NOW CCW  
+//    case 88: basedelay = 5; break;                      //---NEW RAINBOW LOOP
 //    case 101: one_color_all(255,0,0); LEDS.show(); break;   //---ALL RED
 //    case 102: one_color_all(0,255,0); LEDS.show(); break;   //---ALL GREEN
 //    case 103: one_color_all(0,0,255); LEDS.show(); break;   //---ALL BLUE
@@ -962,7 +1299,7 @@ void change_mode(int newmode){
 
 
 //------------------SETUP------------------
-void setup()  
+void setup()
 {
   Serial.begin(SERIAL_BAUDRATE);      // SETUP HARDWARE SERIAL (USB OR BLUETOOTH)
   Serial.setTimeout(SERIAL_TIMEOUT);
@@ -980,98 +1317,140 @@ void setup()
   //LEDS.addLeds<WS2801, LED_CK, LED_DT, RBG, DATA_RATE_MHZ(1)>(leds, LED_COUNT);
   LEDS.addLeds<WS2811, LED_DT, GRB>(leds, LED_COUNT);
 
-  one_color_all(0,0,0); //-CLEAR STRIP
+  one_color_all(0, 0, 0); //-CLEAR STRIP
   LEDS.show();
 }
 
 
 //------------------MAIN LOOP------------------
 void loop() {
-  switch (ledMode) {
-      case 999: break;
-      case  2: rainbow_fade(); break;
-      case  3: rainbow_loop(); break;
-      case  4: random_burst(); break;
-      case  5: color_bounce(); break;
-      case  6: color_bounceFADE(); break;
-      case  7: ems_lightsONE(); break;
-      case  8: ems_lightsALL(); break;
-      case  9: bomber(); break;
-      case 10: pulse_one_color_all(); break;
-      case 11: pulse_one_color_all_rev(); break;
-      case 12: fade_vertical(); break;
-      case 13: theater_chase(); break;
-      case 14: color_implode(); break;
-      case 15: rwb_march(); break;
-      case 16: radiation(); break;
-      case 17: color_loop_vardelay(); break;
-      case 18: white_temps(); break;
-      case 19: sin_bright_wave(); break;
-      case 20: pop_horizontal(); break;
-      case 21: quad_bright_curve(); break;
-      case 22: flame(); break;
-      case 23: rainbow_vertical(); break;
-      case 24: color_explode(); break;
-      case 25: random_color_pop(); break;
-      case 26: ems_lightsSTROBE(); break;
-      case 27: rgb_propeller(); break;
-      case 28: kitt(); break;
-      case 29: matrix(); break;      
-      case 30: discostrobe(); break;
-      case 31: xmas_propeller(); break;
-      case 32: halloween_propeller(); break;    
+
+  if (demoMode > 0) {
+    endDemo = false;
+    run_demo(demoMode);
+  }
+  else {
+    endDemo = true;
+    switch (ledMode) {
+    case 999: break;
+    case  2: rainbow_fade(); break;
+    case  3: rainbow_loop(); break;
+    case  4: random_burst(); break;
+    case  5: color_bounce(); break;
+    case  6: color_bounceFADE(); break;
+    case  7: ems_lightsONE(); break;
+    case  8: ems_lightsALL(); break;
+    case  9: bomber(); break;
+    case 10: pulse_one_color_all(); break;
+    case 11: pulse_one_color_all_rev(); break;
+    case 12: fade_vertical(); break;
+    case 13: theater_chase(); break;
+    case 14: color_implode(); break;
+    case 15: rwb_march(); break;
+    case 16: radiation(); break;
+    case 17: color_loop_vardelay(); break;
+    case 18: white_temps(); break;
+    case 19: sin_bright_wave(); break;
+    case 20: pop_horizontal(); break;
+    case 21: quad_bright_curve(); break;
+    case 22: flame(); break;
+    case 23: rainbow_vertical(); break;
+    case 24: color_explode(); break;
+    case 25: random_color_pop(); break;
+    case 26: ems_lightsSTROBE(); break;
+    case 27: rgb_propeller(); break;
+    case 28: kitt(); break;
+    case 29: matrix(); break;
+    case 30: discostrobe(); break;
+    case 31: xmas_propeller(); break;
+    case 32: halloween_propeller(); break;
     }
 
+    //flow factored out here to provide reusability in demo modes, which would be blocking otherwise
+    control_flow();
+  }
+    
+}
+
+
+int control_flow() {
+  //todo, get a button working
+//  Serial.println(digitalRead(11));
+//  Serial.println(analogRead(5));
+  potentiometer_value = floor(analogRead(POTENTIOMETER_PIN)/150);
+  if (old_potentiometer_value != potentiometer_value) {
+    old_potentiometer_value = potentiometer_value;
+    demoMode = potentiometer_value;
+    endDemo = true;
+  }
+
   //---PROCESS HARDWARE SERIAL COMMANDS AND ARGS
-  while (Serial.available() > 0) {inbyte = Serial.read();
-    switch(inbyte) {
+  while (Serial.available() > 0) {
+    inbyte = Serial.read();
+    Serial.println(inbyte);
+    switch (inbyte) {
     case 59: break; //---BREAK IF INBYTE = ';'
     case 108:      //---"l" - SET SINGLE LED VALUE RGB
       thisindex = Serial.parseInt();
       thisRED = Serial.parseInt();
       thisGRN = Serial.parseInt();
-      thisBLU = Serial.parseInt();      
+      thisBLU = Serial.parseInt();
       if (ledMode != 999) {
         ledMode = 999;
-        one_color_all(0,0,0);}        
-      leds[thisindex].setRGB( thisRED, thisGRN, thisBLU);
+        one_color_all(0, 0, 0);
+      }
+      leds[thisindex].setRGB(thisRED, thisGRN, thisBLU);
       break;
-    case 118:      //---"v" - SET SINGLE LED VALUE HSV
+    case 118:      //---"v" - SET SINGLE LED VALUE HSV, todo, this function should use multipliers, somehow
       thisindex = Serial.parseInt();
       thishue = Serial.parseInt();
       thissat = Serial.parseInt();
       //thisVAL = Serial.parseInt();      
       if (ledMode != 999) {
         ledMode = 999;
-        one_color_all(0,0,0);}
+        one_color_all(0, 0, 0);
+      }
       leds[thisindex] = CHSV(thishue, thissat, 255);
-      break;      
+      break;
     case 100:      //---"d" - SET DELAY VAR
       thisarg = Serial.parseInt();
-      thisdelay = thisarg;
+      thisdelay_multiplier = thisarg;
       break;
     case 115:      //---"s" - SET STEP VAR
       thisarg = Serial.parseInt();
-      thisstep = thisarg;
+      thisstep_multiplier = thisarg;
       break;
     case 104:      //---"h" - SET HUE VAR
       thisarg = Serial.parseInt();
-      thishue = thisarg;
+      thishue_multiplier = thisarg;
       break;
     case 116:      //---"t" - SET SATURATION VAR
       thisarg = Serial.parseInt();
-      thissat = thisarg;
+      thissat_multiplier = thisarg;
       break;
     case 98:      //---"b" - SET MAX BRIGHTNESS
       max_bright = Serial.parseInt();
       LEDS.setBrightness(max_bright);
-      break;      
+      break;
     case 109:      //---"m" - SET MODE
-      thisarg = Serial.parseInt();      
+      thisarg = Serial.parseInt();
       change_mode(thisarg);
       break;
+    case 101:      //---"e" - SET DEMO MODE
+      thisarg = Serial.parseInt();
+      demoMode = thisarg;
+      Serial.print("demoMode is ");
+      Serial.println(demoMode);
+      if(demoMode == 0){
+        endDemo = true;
+      } else {
+        Serial.println("demoMode is not zero");
+        endDemo = false;
+        run_demo(thisarg);
+      }
+      break;
     case 99:      //---"c" - CLEAR STRIP
-      one_color_all(0,0,0);
+      one_color_all(0, 0, 0);
       break;
     case 97:      //---"a" - SET ALL TO ONE COLOR BY HSV 0-255
       thisarg = Serial.parseInt();
@@ -1089,25 +1468,26 @@ void loop() {
   //---PROCESS SOFTWARE SERIAL COMMANDS AND ARGS
   //---NOTE* USE OF SOFTWARE SERIAL WITH A HIGH NUMBER OF LEDS (MORE THAN 120) MAY CAUSE LATENCY AND LOSS OF BYTES WITH SOFTWARE SERIAL IMPLEMENTATIONS
   while (btSerial.available() > 0) {
-    
+
     inbyte = btSerial.read();
-    if (btSerial.overflow()){Serial.println("SO!");}
-    switch(inbyte) {
+    if (btSerial.overflow()) { Serial.println("SO!"); }
+    switch (inbyte) {
     case 59:
       break; //---BREAK IF INBYTE = ';'
     case 108:      //---"l" - SET SINGLE LED VALUE
       thisindex = btSerial.parseInt();
       thisRED = btSerial.parseInt();
       thisGRN = btSerial.parseInt();
-      thisBLU = btSerial.parseInt();    
+      thisBLU = btSerial.parseInt();
       if (ledMode != 999) {
         ledMode = 999;
-        one_color_all(0,0,0);}        
-      leds[thisindex].setRGB( thisRED, thisGRN, thisBLU);
+        one_color_all(0, 0, 0);
+      }
+      leds[thisindex].setRGB(thisRED, thisGRN, thisBLU);
       break;
     case 100:      //---"d" - SET DELAY VAR
       thisarg = btSerial.parseInt();
-      thisdelay = thisarg;
+      thisdelay_multiplier = thisarg;
       break;
     case 115:      //---"s" - SET STEP VAR
       thisarg = btSerial.parseInt();
@@ -1124,13 +1504,18 @@ void loop() {
     case 98:      //---"b" - SET MAX BRIGHTNESS
       max_bright = btSerial.parseInt();
       LEDS.setBrightness(max_bright);
-      break;      
+      break;
     case 109:      //---"m" - SET MODE
-      thisarg = btSerial.parseInt();    
+      thisarg = btSerial.parseInt();
       change_mode(thisarg);
       break;
+    case 101:      //---"e" - SET DEMO MODE
+      thisarg = btSerial.parseInt();
+      demoMode = thisarg;
+      run_demo(thisarg);
+      break;
     case 99:      //---"c" - CLEAR STRIP
-      one_color_all(0,0,0);
+      one_color_all(0, 0, 0);
       break;
     case 97:      //---"a" - SET ALL TO ONE COLOR BY HSV 0-255
       thisarg = btSerial.parseInt();
@@ -1138,8 +1523,14 @@ void loop() {
       break;
     case 122:      //---"z" - COMMAND TO 'SHOW' LEDS
       LEDS.show();
-      break;        
+      break;
     }
   }
 
+
+  thisdelay = basedelay * thisdelay_multiplier;
+  thisstep = basestep * thisstep_multiplier;
+  thishue = basehue * thishue_multiplier;
+  thissat = basesat * thissat_multiplier;
+  return endDemo;
 }
