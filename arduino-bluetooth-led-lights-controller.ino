@@ -15,8 +15,8 @@
 #define VERSION_NUMBER 0.51
 
 //---LED SETUP STUFF
-#define LED_COUNT 60          //FOR TESTING w/ SIGN
-#define LED_DT 13             //SERIAL DATA PIN
+#define LED_COUNT 300          //FOR TESTING w/ SIGN
+#define LED_DT 9             //SERIAL DATA PIN
 #define POTENTIOMETER_PIN 3             //POTENTIOMETER PIN
 //#define LED_CK 11             //SERIAL CLOCK PIN
 
@@ -1195,6 +1195,9 @@ void run_demo(int mode) {
 //-Many of the following cases were commented out to prevent the strip's hue, saturation, and delay from resetting when another mode is chosen.
 //-The responsibility of changing these parameters prior to a mode change would preferibly be done in the bluetooth controlling device fia multiple commands in the same byte stream.
 void change_mode(int newmode) {
+  //todo, could this type of controlling be moved to a utility function
+  demoMode = 0;
+  endDemo = true;
   basesat = 255;
   switch (newmode) {
   case 0: one_color_all(0, 0, 0); LEDS.show(); break;   //---ALL OFF
@@ -1435,6 +1438,8 @@ int control_flow() {
     case 109:      //---"m" - SET MODE
       thisarg = Serial.parseInt();
       change_mode(thisarg);
+      endDemo = true;
+      demoMode = 0;
       break;
     case 101:      //---"e" - SET DEMO MODE
       thisarg = Serial.parseInt();
@@ -1508,6 +1513,8 @@ int control_flow() {
     case 109:      //---"m" - SET MODE
       thisarg = btSerial.parseInt();
       change_mode(thisarg);
+      endDemo = true;
+      demoMode = 0;
       break;
     case 101:      //---"e" - SET DEMO MODE
       thisarg = btSerial.parseInt();
